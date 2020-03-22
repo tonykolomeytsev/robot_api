@@ -6,6 +6,6 @@ setup(
     description="Simple API for four-legged robot",
     author="Anton Kolomeytsev",
     author_email="tonykolomeytsev@gmail.com",
-    packages=["robot_api"],
+    packages=["robot_api", "robot_api.core"],
     classifiers=["Programming Language :: Python :: 3"]
 )
