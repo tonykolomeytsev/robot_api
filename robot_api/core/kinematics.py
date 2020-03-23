@@ -1,5 +1,6 @@
 from math import sin, cos, sqrt, acos, asin, pi
 from .constants import A0, A1, A2, A3, A5, A6, A7, A8, A9, A10
+import numpy as np
 
 
 def direct(phi1, phi2, phi3):
@@ -19,6 +20,7 @@ def direct(phi1, phi2, phi3):
 
 
 def four_link_angle(phi3):
+    """ returns angle of the last joint """
     d = sqrt(A5**2 + A7**2 - 2 * A5 * A7 * cos(phi3 + pi/2))
     gamma = asin((A5 / d) * cos(phi3))
     delta = acos((d**2 + A9**2 - A7**2) / (2 * d * A9))
@@ -28,3 +30,14 @@ def four_link_angle(phi3):
 def four_link_angle_fast(phi3):
     """ phi4 is approx equal to phi3 """
     return phi3
+
+
+def jacobian(phi1, phi2, phi3):
+    h = pi * 1e-4 # diff step
+    F = np.array(direct(phi1, phi2, phi3))
+    dFdPhi1 = (np.array(direct(phi1 + h, phi2, phi3)) - F) / h
+    dFdPhi2 = (np.array(direct(phi1, phi2 + h, phi3)) - F) / h
+    dFdPhi3 = (np.array(direct(phi1, phi2, phi3 + h)) - F) / h
+    return np.array([dFdPhi1, dFdPhi2, dFdPhi3]).reshape((3, 3)).T
+     
+    

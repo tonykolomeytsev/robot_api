@@ -1,6 +1,7 @@
 import unittest
-from robot_api.core.kinematics import direct, four_link_angle, four_link_angle_fast
+from robot_api.core.kinematics import *
 from math import pi
+import numpy as np
 
 def err(x):
     return x*x
@@ -53,3 +54,17 @@ class KinematicsTest(unittest.TestCase):
         assert(err(Y - 0.145709) < 1e-3)
         assert(err(Z - 0) < 1e-3)
     
+
+    def test_jacobian(self):
+        """ JACOBIAN TEST """
+        J = jacobian(pi/2, 0, 0)
+        expected_J = np.array([0, 0.0994888, 0.0137636, \
+                               0, -0.154015, -0.121244, \
+                                -0.145709, 0, 0]).reshape((3, 3))
+        assert(np.linalg.norm(expected_J - J, 2) < 1e-3)
+
+        J = jacobian(0, -pi/2, -pi/4)
+        expected_J = np.array([0, 0.103483, 0.0730283, \
+                               0.149703, 0, 0, \
+                               0, 0.180386, 0.114652]).reshape((3, 3))
+        assert(np.linalg.norm(expected_J - J, 2) < 1e-3)
