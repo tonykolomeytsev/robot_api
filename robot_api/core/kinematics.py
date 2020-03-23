@@ -3,12 +3,13 @@ from .constants import A0, A1, A2, A3, A5, A6, A7, A8, A9, A10
 import numpy as np
 
 
-def direct(phi1, phi2, phi3):
+def direct(angles):
     """ 
     SOLVING THE DIRECT KINEMATICS PROBLEM \n
     The angles should be indicated in the coordinates
     of the kinematic problem, in radians
     """
+    phi1, phi2, phi3 = angles[0], angles[1], angles[2]
     phi4 = four_link_angle(phi3) - (pi/2)
     X = A2 + A3 * cos(phi2) + A6 * sin(phi2) + A8 * sin(phi2 + phi4) \
         + (A9 + A10) * cos(phi2 + phi4)
@@ -16,7 +17,7 @@ def direct(phi1, phi2, phi3):
         - (A9 + A10) * sin(phi2 + phi4)
     Y = V * sin(phi1)
     Z = V * cos(phi1)
-    return (X, Y, Z)
+    return np.array([X, Y, Z])
 
 
 def four_link_angle(phi3):
@@ -32,12 +33,34 @@ def four_link_angle_fast(phi3):
     return phi3
 
 
-def jacobian(phi1, phi2, phi3):
+def jacobian(angles):
     h = pi * 1e-4 # diff step
-    F = np.array(direct(phi1, phi2, phi3))
-    dFdPhi1 = (np.array(direct(phi1 + h, phi2, phi3)) - F) / h
-    dFdPhi2 = (np.array(direct(phi1, phi2 + h, phi3)) - F) / h
-    dFdPhi3 = (np.array(direct(phi1, phi2, phi3 + h)) - F) / h
+    F = direct(angles)
+    eye = np.eye(3) * h # matrix with all h in diagonal elements
+    dFdPhi1 = (direct(angles + eye[0]) - F) / h
+    dFdPhi2 = (direct(angles + eye[1]) - F) / h
+    dFdPhi3 = (direct(angles + eye[2]) - F) / h
     return np.array([dFdPhi1, dFdPhi2, dFdPhi3]).reshape((3, 3)).T
-     
     
+    
+def inversed(coordinates):
+    """ 
+    SOLVING THE INVERSE KINEMATICS PROBLEM \n
+    Param coordinates is [X, Y, Z] numpy vector, in meters.
+    This function uses Newton's numerical method.
+    """
+    phis = np.array([pi/8, -pi/2, -pi/4])
+    error = np.ones((3,), dtype=np.float64)
+
+    i = 0
+    while np.linalg.norm(error, 2) > 1e-2 and i < 100:
+        J = jacobian(phis)
+        X = direct(phis)
+        error = X - coordinates
+        print("iter: {}; error: {}; q: {};".format(i, error, phis))
+        p = np.linalg.pinv(J).dot(error)
+        phis = phis - p
+        i += 1
+    
+    return phis
+

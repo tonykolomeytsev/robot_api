@@ -37,19 +37,22 @@ class KinematicsTest(unittest.TestCase):
     def test_direct_kinematics(self):
         """ DIRECT KINEMATICS TEST """
         # leg is fully expanded
-        X, Y, Z = direct(0, -pi/2, -pi/4)
+        result = direct([0, -pi/2, -pi/4])
+        X, Y, Z = result[0], result[1], result[2]
         assert(err(X - -0.160366) < 1e-3)
         assert(err(Y - 0) < 1e-3)
         assert(err(Z - 0.149703) < 1e-3)
 
         # leg is fully closed
-        X, Y, Z = direct(0, 0, pi/4)
+        result = direct([0, 0, pi/4])
+        X, Y, Z = result[0], result[1], result[2]
         assert(err(X - 0.142443) < 1e-3)
         assert(err(Y - 0) < 1e-3)
         assert(err(Z - 0.0550596) < 1e-3)
 
         # leg is bent 90 degree
-        X, Y, Z = direct(pi/2, 0, 0)
+        result = direct([pi/2, 0, 0])
+        X, Y, Z = result[0], result[1], result[2]
         assert(err(X - 0.174035) < 1e-3)
         assert(err(Y - 0.145709) < 1e-3)
         assert(err(Z - 0) < 1e-3)
@@ -57,14 +60,19 @@ class KinematicsTest(unittest.TestCase):
 
     def test_jacobian(self):
         """ JACOBIAN TEST """
-        J = jacobian(pi/2, 0, 0)
+        J = jacobian([pi/2, 0, 0])
         expected_J = np.array([0, 0.0994888, 0.0137636, \
                                0, -0.154015, -0.121244, \
                                 -0.145709, 0, 0]).reshape((3, 3))
-        assert(np.linalg.norm(expected_J - J, 2) < 1e-3)
+        assert(np.linalg.norm(expected_J - J, 2) < 1e-4)
 
-        J = jacobian(0, -pi/2, -pi/4)
+        J = jacobian([0, -pi/2, -pi/4])
         expected_J = np.array([0, 0.103483, 0.0730283, \
                                0.149703, 0, 0, \
                                0, 0.180386, 0.114652]).reshape((3, 3))
-        assert(np.linalg.norm(expected_J - J, 2) < 1e-3)
+        assert(np.linalg.norm(expected_J - J, 2) < 1e-4)
+    
+    def test_inversed(self):
+        """ INVERSED KINEMATICS TEST """
+        
+        assert(np.linalg.norm(inversed(direct([0, -0.2, -0.4])) - np.array([0, -0.2, -0.4])) < 1e-3)
