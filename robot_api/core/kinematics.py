@@ -58,7 +58,7 @@ def inversed(coordinates):
         X = direct(phis)
         error = X - coordinates
         print("iter: {}; error: {}; q: {};".format(i, error, phis))
-        p = np.linalg.pinv(J).dot(error)
+        p = np.matmul(error, np.linalg.pinv(J))
         phis = phis - p
         i += 1
     
