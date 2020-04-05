@@ -3,14 +3,14 @@ from .constants import A0, A1, A2, A3, A5, A6, A7, A8, A9, A10
 import numpy as np
 
 
-def direct(angles):
+def direct(angles, fast=False):
     """ 
     SOLVING THE DIRECT KINEMATICS PROBLEM \n
     The angles should be indicated in the coordinates
     of the kinematic problem, in radians
     """
     phi1, phi2, phi3 = angles[0], angles[1], angles[2]
-    phi4 = four_link_angle(phi3) - (pi/2)
+    phi4 = four_link_angle(phi3) - (pi/2) if not fast else phi3
     X = A2 + A3 * cos(phi2) + A6 * sin(phi2) + A8 * sin(phi2 + phi4) \
         + (A9 + A10) * cos(phi2 + phi4)
     V = A1 - A3 * sin(phi2) + A6 * cos(phi2) + A8 * cos(phi2 + phi4) \
@@ -43,24 +43,25 @@ def jacobian(angles):
     return np.array([dFdPhi1, dFdPhi2, dFdPhi3]).reshape((3, 3)).T
     
     
-def inversed(coordinates):
+def inversed(coordinates, fast=False):
     """ 
     SOLVING THE INVERSE KINEMATICS PROBLEM \n
     Param coordinates is [X, Y, Z] numpy vector, in meters.
     This function uses Newton's numerical method.
     """
-    phis = np.array([pi/8, -pi/2, -pi/4])
+    phis = np.array([pi/16, pi/16, pi*2]) if fast else inversed(coordinates, fast=True)
     error = np.ones((3,), dtype=np.float64)
 
     i = 0
-    while np.linalg.norm(error, 2) > 1e-2 and i < 100:
+    while np.linalg.norm(error, 2) > 1e-5 and i < 100:
         J = jacobian(phis)
-        X = direct(phis)
+        X = direct(phis, fast)
         error = X - coordinates
-        print("iter: {}; error: {}; q: {};".format(i, error, phis))
-        p = np.matmul(error, np.linalg.pinv(J))
+        print("iter: {}; q: {}; f1: {}".format(i, phis, X))
+        p = np.matmul(np.linalg.pinv(J), error)
         phis = phis - p
         i += 1
     
+    print("ans: {};".format(phis))
     return phis
 

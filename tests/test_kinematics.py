@@ -72,7 +72,49 @@ class KinematicsTest(unittest.TestCase):
                                0, 0.180386, 0.114652]).reshape((3, 3))
         assert(np.linalg.norm(expected_J - J, 2) < 1e-4)
     
-    def test_inversed(self):
+    def test_inversed_kinematics(self):
         """ INVERSED KINEMATICS TEST """
-        
-        assert(np.linalg.norm(inversed(direct([0, -0.2, -0.4])) - np.array([0, -0.2, -0.4])) < 1e-3)
+        arr = [
+            [0,     -pi/2,  -pi/4],
+            [pi/4,  -pi/2,  -pi/4],
+            [pi/2,  -pi/2,  -pi/4],
+
+            [0,     -pi/4,  -pi/4],
+            [pi/4,  -pi/4,  -pi/4],
+            [pi/2,  -pi/4,  -pi/4],
+
+            [0,     0,      -pi/4],
+            [pi/4,  0,      -pi/4],
+            [pi/2,  0,      -pi/4],
+
+
+            [0,     -pi/2,  0],
+            [pi/4,  -pi/2,  0],
+            [pi/2,  -pi/2,  0],
+
+            [0,     -pi/4,  0],
+            [pi/4,  -pi/4,  0],
+            [pi/2,  -pi/4,  0],
+
+            [0,     0,      0],
+            [pi/4,  0,      0],
+            [pi/2,  0,      0],
+
+
+            [0,     -pi/2,  pi/4],
+            [pi/4,  -pi/2,  pi/4],
+            [pi/2,  -pi/2,  pi/4],
+
+            [0,     -pi/4,  pi/4],
+            [pi/4,  -pi/4,  pi/4],
+            [pi/2,  -pi/4,  pi/4],
+
+            [0,     0,      pi/4],
+            [pi/4,  0,      pi/4],
+            [pi/2,  0,      pi/4],
+        ]
+        for i, q in enumerate(arr):
+            print("Test point #{}".format(i))
+            result = inversed(direct(q))
+            norm = np.linalg.norm(np.array(q) - result)
+            print("norm={}".format(norm))
