@@ -74,47 +74,48 @@ class KinematicsTest(unittest.TestCase):
     
     def test_inversed_kinematics(self):
         """ INVERSED KINEMATICS TEST """
+        cache_inversed_kinematics()
         arr = [
             [0,     -pi/2,  -pi/4],
-            [pi/4,  -pi/2,  -pi/4],
-            [pi/2,  -pi/2,  -pi/4],
+            [pi/16, -pi/2,  -pi/4],
+            [pi/8,  -pi/2,  -pi/4],
 
             [0,     -pi/4,  -pi/4],
-            [pi/4,  -pi/4,  -pi/4],
-            [pi/2,  -pi/4,  -pi/4],
+            [pi/16, -pi/4,  -pi/4],
+            [pi/8,  -pi/4,  -pi/4],
 
             [0,     0,      -pi/4],
-            [pi/4,  0,      -pi/4],
-            [pi/2,  0,      -pi/4],
+            [pi/16, 0,      -pi/4],
+            [pi/8,  0,      -pi/4],
 
 
             [0,     -pi/2,  0],
-            [pi/4,  -pi/2,  0],
-            [pi/2,  -pi/2,  0],
+            [pi/16, -pi/2,  0],
+            [pi/8,  -pi/2,  0],
 
             [0,     -pi/4,  0],
-            [pi/4,  -pi/4,  0],
-            [pi/2,  -pi/4,  0],
+            [pi/16, -pi/4,  0],
+            [pi/8,  -pi/4,  0],
 
             [0,     0,      0],
-            [pi/4,  0,      0],
-            [pi/2,  0,      0],
+            [pi/16, 0,      0],
+            [pi/8,  0,      0],
 
 
             [0,     -pi/2,  pi/4],
-            [pi/4,  -pi/2,  pi/4],
-            [pi/2,  -pi/2,  pi/4],
+            [pi/16, -pi/2,  pi/4],
+            [pi/8,  -pi/2,  pi/4],
 
             [0,     -pi/4,  pi/4],
-            [pi/4,  -pi/4,  pi/4],
-            [pi/2,  -pi/4,  pi/4],
+            [pi/16, -pi/4,  pi/4],
+            [pi/8,  -pi/4,  pi/4],
 
             [0,     0,      pi/4],
-            [pi/4,  0,      pi/4],
-            [pi/2,  0,      pi/4],
+            [pi/16, 0,      pi/4],
+            [pi/8,  0,      pi/4],
         ]
         for i, q in enumerate(arr):
-            print("Test point #{}".format(i))
+            print("Test point #{}".format(i+1))
             result = inversed(direct(q))
             norm = np.linalg.norm(np.array(q) - result)
             print("norm={}".format(norm))

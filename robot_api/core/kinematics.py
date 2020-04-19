@@ -1,6 +1,9 @@
 from math import sin, cos, sqrt, acos, asin, pi
-from .constants import A0, A1, A2, A3, A5, A6, A7, A8, A9, A10
+from .constants import A0, A1, A2, A3, A5, A6, A7, A8, A9, A10, PHI1_RANGE, PHI2_RANGE, PHI3_RANGE
 import numpy as np
+
+
+cache = []
 
 
 def direct(angles, fast=False):
@@ -49,7 +52,7 @@ def inversed(coordinates, fast=False):
     Param coordinates is [X, Y, Z] numpy vector, in meters.
     This function uses Newton's numerical method.
     """
-    phis = np.array([pi/16, pi/16, pi*2]) if fast else inversed(coordinates, fast=True)
+    phis = find_nearest_solution(coordinates)
     error = np.ones((3,), dtype=np.float64)
 
     i = 0
@@ -57,11 +60,29 @@ def inversed(coordinates, fast=False):
         J = jacobian(phis)
         X = direct(phis, fast)
         error = X - coordinates
-        print("iter: {}; q: {}; f1: {}".format(i, phis, X))
         p = np.matmul(np.linalg.pinv(J), error)
         phis = phis - p
         i += 1
     
-    print("ans: {};".format(phis))
     return phis
+
+
+def find_nearest_solution(coordinates):
+    global cache
+    return min(cache, key=lambda di: np.linalg.norm((coordinates - di[0]), ord=2))[1]
+
+
+def cache_inversed_kinematics():
+    global cache
+    cache = []
+    phi1_start, phi1_end = PHI1_RANGE
+    phi2_start, phi2_end = PHI2_RANGE
+    phi3_start, phi3_end = PHI3_RANGE
+    
+    for phi1 in np.linspace(phi1_start, phi1_end, num=2):
+        for phi2 in np.linspace(phi2_start, phi2_end, num=10):
+            for phi3 in np.linspace(phi3_start, phi3_end, num=10):
+                angles = [phi1, phi2, phi3]
+                cache.append((direct(angles), np.array(angles)))
+    
 
